@@ -20,19 +20,23 @@ app.get("/", function(req, res) {
 
 
 // your first API endpoint... 
-app.get('/api/:input', (req, res) => {
-    var input = req.params.input;
-    let unix = input;
-    if (/-/.test(input)) {
-        input = input.split("-")
-        input[1] = input[1] - 1;
-        unix = Date.UTC(...input, 0);
-    } else {
-        unix = Number(input);
-    }
-    res.json({ unix: unix, utc: new Date(unix).toUTCString() });
+app.get("/api", (req, res) => {
+    const date = new Date();
+    res.json({ unix: date.valueOf(), utc: date.toUTCString() });
 });
 
+app.get("/api/:input", (req, res) => {
+    var input = req.params.input;
+    let date = new Date(input);
+    if (date == "Invalid Date") {
+        date = new Date(Number(input));
+        if (date == "Invalid Date") {
+            res.json({ error: "Invalid Date" });
+            return;
+        }
+    }
+    res.json({ unix: date.valueOf(), utc: date.toUTCString() });
+});
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function() {
